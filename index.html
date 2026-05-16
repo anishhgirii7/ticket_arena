@@ -125,7 +125,7 @@
 async function loadFeaturedEvents() {
     const grid = document.getElementById('eventsGrid');
     try {
-        const res = await fetch('http://127.0.0.1:5000/api/events');
+        const res = await fetch(`${API}/api/events`);
         const events = await res.json();
 
         if (!events.length) {
