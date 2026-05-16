@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Tickets – Ticket Arena</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bookings.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <a href="index.html" class="logo">TICKET<span>ARENA</span></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="dashboard.html">My Tickets</a></li>
+        </ul>
+        <div class="nav-buttons" id="navButtons">
+            <a href="login.html" class="btn-outline">Login</a>
+        </div>
+    </nav>
+
+    <div class="booking-container">
+
+        <!-- LEFT: SEAT MAP + PAYMENT -->
+        <div class="booking-left">
+            <h2>SELECT YOUR <span>SEATS</span></h2>
+
+            <!-- SEAT MAP -->
+            <div class="seat-map">
+                <div class="seat-map-title">Choose your seats</div>
+                <div class="stage">STAGE / FIELD</div>
+                <div class="seat-grid" id="seatGrid"></div>
+                <div class="seat-legend">
+                    <div class="legend-item"><div class="legend-box"></div> Available</div>
+                    <div class="legend-item"><div class="legend-box selected"></div> Selected</div>
+                    <div class="legend-item"><div class="legend-box taken"></div> Taken</div>
+                </div>
+            </div>
+
+            <!-- PAYMENT FORM -->
+            <div class="payment-form">
+                <div class="payment-title">PAYMENT DETAILS</div>
+                <div class="form-group">
+                    <label>Cardholder Name</label>
+                    <input type="text" id="cardName" placeholder="John Smith">
+                </div>
+                <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expiry</label>
+                        <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" id="cardCVV" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+                <button class="btn-full" onclick="confirmBooking()">Confirm & Pay</button>
+            </div>
+        </div>
+
+        <!-- RIGHT: SUMMARY PANEL -->
+        <div>
+            <div class="booking-summary">
+                <div class="summary-title">ORDER SUMMARY</div>
+                <div class="summary-row"><span>Event</span><span id="summaryEvent">—</span></div>
+                <div class="summary-row"><span>Date</span><span id="summaryDate">—</span></div>
+                <div class="summary-row"><span>Venue</span><span id="summaryVenue">—</span></div>
+                <div class="summary-row"><span>Seats Selected</span><span id="summarySeats">None</span></div>
+                <div class="summary-row"><span>Price per Seat</span><span id="summaryPrice">$0</span></div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span id="summaryTotal">$0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <div class="footer-logo">TICKET<span>ARENA</span></div>
+            <div class="footer-text">© 2026 TicketArena. All rights reserved.</div>
+        </div>
+        <ul class="footer-links">
+            <li><a href="events.html">Events</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </footer>
+
+    <script src="main.js"></script>
+<script>
+
+let selectedSeats = [];
+let pricePerSeat = 0;
+let eventId = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    eventId = params.get('id');
+
+    if (!eventId) {
+        document.getElementById('summaryEvent').textContent = 'No event selected';
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/api/events/${eventId}`);
+        const event = await res.json();
+
+        pricePerSeat = parseFloat(event.price);
+        document.getElementById('summaryEvent').textContent = event.title;
+        document.getElementById('summaryDate').textContent = new Date(event.event_date).toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'});
+        document.getElementById('summaryVenue').textContent = `${event.venue}, ${event.city}`;
+        document.getElementById('summaryPrice').textContent = '$' + pricePerSeat.toFixed(2);
+
+        const grid = document.getElementById('seatGrid');
+        grid.innerHTML = '';
+        for (let i = 1; i <= 40; i++) {
+            const seat = document.createElement('div');
+            seat.className = 'seat';
+            seat.textContent = i;
+            seat.dataset.seat = i;
+            seat.onclick = () => toggleSeat(seat, i);
+            grid.appendChild(seat);
+        }
+    } catch (err) {
+        document.getElementById('summaryEvent').textContent = 'Could not load event.';
+    }
+});
+
+function toggleSeat(el, num) {
+    if (el.classList.contains('selected')) {
+        el.classList.remove('selected');
+        selectedSeats = selectedSeats.filter(s => s !== num);
+    } else {
+        el.classList.add('selected');
+        selectedSeats.push(num);
+    }
+    document.getElementById('summarySeats').textContent = selectedSeats.length ? selectedSeats.join(', ') : 'None';
+    document.getElementById('summaryTotal').textContent = '$' + (selectedSeats.length * pricePerSeat).toFixed(2);
+}
+
+async function confirmBooking() {
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    if (!user.id && !user.full_name) {
+        alert('Please log in to book tickets.');
+        window.location.href = 'login.html';
+        return;
+    }
+    if (!selectedSeats.length) { alert('Please select at least one seat.'); return; }
+
+    const name = document.getElementById('cardName').value.trim();
+    const number = document.getElementById('cardNumber').value.trim();
+    const expiry = document.getElementById('cardExpiry').value.trim();
+    const cvv = document.getElementById('cardCVV').value.trim();
+    if (!name || !number || !expiry || !cvv) {
+        alert('Please fill in all payment details.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/api/bookings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ 
+                event_id: parseInt(eventId), 
+                quantity: selectedSeats.length,
+                user_id: user.id
+            })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert(`Booking confirmed! Booking ID: ${data.booking_id}. Total: $${data.total_amount}`);
+            window.location.href = 'dashboard.html';
+        } else {
+            alert(data.error || 'Booking failed. Please try again.');
+        }
+    } catch (err) {
+        alert('Cannot connect to server. Make sure backend is running.');
+    }
+}
+</script>
+        
+
+
+    
+</body>
+</html>

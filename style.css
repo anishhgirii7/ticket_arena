@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ── CSS VARIABLES ── */
+:root {
+    --red: #e8132a;
+    --dark: #0a0a0a;
+    --darker: #050505;
+    --card: #111111;
+    --border: #222222;
+    --text: #f0f0f0;
+    --muted: #888888;
+    --gold: #f5c518;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--darker);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+/* ── NAVBAR ── */
+nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 48px;
+    background: rgba(5,5,5,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.logo span { color: var(--red); }
+
+.nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-buttons { display: flex; gap: 12px; align-items: center; }
+
+/* ── SHARED BUTTONS ── */
+.btn-outline {
+    padding: 9px 22px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+}
+
+.btn-outline:hover { border-color: var(--red); color: var(--red); }
+
+.btn-primary {
+    padding: 9px 22px;
+    background: var(--red);
+    border: 1px solid var(--red);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary:hover { background: #c0101f; }
+
+.btn-large {
+    padding: 15px 36px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+}
+
+.btn-large.primary { background: var(--red); color: white; border: none; }
+.btn-large.primary:hover { background: #c0101f; transform: translateY(-1px); }
+.btn-large.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-large.secondary:hover { border-color: var(--text); }
+
+/* ── FOOTER ── */
+footer {
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 3px;
+}
+
+.footer-logo span { color: var(--red); }
+.footer-text { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.footer-links { display: flex; gap: 24px; list-style: none; }
+
+.footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--text); }
+
+/* ── SHARED ANIMATION ── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events – Ticket Arena</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="events.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <a href="index.html" class="logo">TICKET<span>ARENA</span></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="dashboard.html">My Tickets</a></li>
+        </ul>
+        <div class="nav-buttons">
+            <a href="login.html" class="btn-outline">Login</a>
+            <a href="login.html" class="btn-primary">Sign Up</a>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1>ALL <span>EVENTS</span></h1>
+        <p>Browse and book tickets for upcoming sports events across Australia</p>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-bar">
+        <input type="text" id="searchInput" placeholder="Search events or venues...">
+        <select id="sportFilter">
+            <option value="">All Sports</option>
+            <option value="Rugby">Rugby</option>
+            <option value="AFL">AFL</option>
+            <option value="Cricket">Cricket</option>
+            <option value="Soccer">Soccer</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Boxing">Boxing</option>
+        </select>
+        <button onclick="searchEvents()">Filter</button>
+    </div>
+
+    <!-- EVENTS GRID -->
+    <div class="events-section">
+        <div class="results-count">Showing <span id="resultCount">all</span> events</div>
+        <div class="events-grid" id="eventsGrid">
+            <p style="color:var(--muted)">Loading events...</p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <div class="footer-logo">TICKET<span>ARENA</span></div>
+            <div class="footer-text">© 2026 TicketArena. All rights reserved.</div>
+        </div>
+        <ul class="footer-links">
+            <li><a href="events.html">Events</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+
+
+async function loadEvents(sport = '') {
+    const grid = document.getElementById('eventsGrid');
+    grid.innerHTML = '<p style="color:var(--muted)">Loading events...</p>';
+    
+    try {
+        const url = sport ? `${API}/api/events?sport=${sport}` : `${API}/api/events`;
+        const res = await fetch(url);
+        const events = await res.json();
+        
+        document.getElementById('resultCount').textContent = events.length;
+        
+        if (events.length === 0) {
+            grid.innerHTML = '<p style="color:var(--muted)">No events found.</p>';
+            return;
+        }
+        
+        grid.innerHTML = events.map(e => `
+            <div class="event-card">
+                <div class="event-sport">${e.sport}</div>
+                <h3 class="event-title">${e.title}</h3>
+                <div class="event-details">
+                    <span>📅 ${new Date(e.event_date).toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'})}</span>
+                    <span>🏟️ ${e.venue}, ${e.city}</span>
+                    <span>💺 ${e.available_seats} seats left</span>
+                </div>
+                <div class="event-footer">
+                    <span class="event-price">$${parseFloat(e.price).toFixed(2)}</span>
+                    <a href="booking.html?id=${e.id}" class="btn-primary">Book Now</a>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (err) {
+        grid.innerHTML = '<p style="color:red">Could not load events. Make sure backend is running.</p>';
+    }
+}
+
+function searchEvents() {
+    const sport = document.getElementById('sportFilter').value;
+    loadEvents(sport);
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+    const search = this.value.toLowerCase();
+    document.querySelectorAll('.event-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(search) ? 'block' : 'none';
+    });
+});
+
+loadEvents();
+</script>
+</body>
+</html>

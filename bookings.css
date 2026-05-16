@@ -1,0 +1,208 @@
+/* ── BOOKING LAYOUT ── */
+.booking-container {
+    padding: 120px 48px 80px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.booking-left h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+}
+
+.booking-left h2 span { color: var(--red); }
+
+/* ── SEAT MAP ── */
+.seat-map {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 24px;
+}
+
+.seat-map-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.stage {
+    background: var(--red);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+}
+
+.seat-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.seat {
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition: all 0.15s;
+    background: var(--darker);
+}
+
+.seat:hover { border-color: var(--red); color: var(--red); }
+.seat.selected { background: var(--red); border-color: var(--red); color: white; }
+.seat.taken { background: #1a1a1a; border-color: #1a1a1a; cursor: not-allowed; color: #333; }
+
+/* ── SEAT LEGEND ── */
+.seat-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.legend-box {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--border);
+}
+
+.legend-box.selected { background: var(--red); border-color: var(--red); }
+.legend-box.taken { background: #1a1a1a; border-color: #1a1a1a; }
+
+/* ── BOOKING SUMMARY PANEL ── */
+.booking-summary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.summary-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: var(--muted);
+}
+
+.summary-row span:last-child { color: var(--text); }
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+}
+
+.summary-total span:first-child { font-size: 14px; font-weight: 600; }
+
+.summary-total span:last-child {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--gold);
+}
+
+/* ── PAYMENT FORM ── */
+.payment-form {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-top: 24px;
+}
+
+.payment-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--darker);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus { border-color: var(--red); }
+.form-group input::placeholder { color: var(--muted); }
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.btn-full {
+    width: 100%;
+    padding: 15px;
+    background: var(--red);
+    color: white;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: background 0.2s;
+    margin-top: 8px;
+}
+
+.btn-full:hover { background: #c0101f; }

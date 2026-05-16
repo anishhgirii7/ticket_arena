@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – Ticket Arena</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <a href="index.html" class="logo">TICKET<span>ARENA</span></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+        </ul>
+        <div class="nav-buttons">
+            <a href="login.html" class="btn-primary">Login</a>
+        </div>
+    </nav>
+
+    <!-- LOGIN BOX -->
+    <div class="login-page">
+        <div class="login-box">
+            <div class="login-title">WELCOME TO <span>TICKET ARENA</span></div>
+            <div class="login-subtitle">Login or create an account to book tickets</div>
+
+            <!-- TABS -->
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('login')">Login</div>
+                <div class="tab" onclick="showTab('register')">Register</div>
+            </div>
+
+            <!-- ERROR / SUCCESS -->
+            <div class="error-msg" id="errorMsg"></div>
+            <div class="success-msg" id="successMsg"></div>
+
+            <!-- LOGIN FORM -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="you@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Your password">
+                </div>
+                <button class="btn-full" onclick="handleLogin()">Login</button>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="registerForm" style="display:none">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="John Smith">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" placeholder="you@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters">
+                </div>
+                <button class="btn-full" onclick="handleRegister()">Create Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+     function showTab(tab) {
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'login')));
+}
+
+
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) { showError('Please fill in all fields.'); return; }
+
+    try {
+        const res = await fetch(`${API}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            sessionStorage.setItem('user', JSON.stringify(data.user));
+            window.location.href = 'index.html';
+        } else {
+            showError(data.error || 'Login failed.');
+        }
+    } catch (err) {
+        showError('Cannot connect to server. Make sure backend is running.');
+    }
+}
+
+async function handleRegister() {
+    const full_name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    if (!full_name || !email || !password) { showError('Please fill in all fields.'); return; }
+    if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+
+    try {
+        const res = await fetch(`${API}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ full_name, email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showSuccess('Account created! You can now login.');
+            document.getElementById('loginEmail').value = email;
+            showTab('login');
+        } else {
+            showError(data.error || 'Registration failed.');
+        }
+    } catch (err) {
+        showError('Cannot connect to server. Make sure backend is running.');
+    }
+}
+
+function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('successMsg').style.display = 'none';
+}
+
+function showSuccess(msg) {
+    const el = document.getElementById('successMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('errorMsg').style.display = 'none';
+}
+    </script>
+</body>
+</html>
