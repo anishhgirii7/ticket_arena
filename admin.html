@@ -146,39 +146,28 @@
         </tbody>
     </table>
 </div>
-
 <script>
 const API = 'https://ticket-arena-backend-production.up.railway.app';
+const ADMIN_TOKEN = 'admin123';
 
 async function adminLogin() {
     const username = document.getElementById('adminUser').value.trim();
     const password = document.getElementById('adminPass').value.trim();
 
-    try {
-        const res = await fetch(`${API}/api/auth/admin-login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadEvents();
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-            document.getElementById('loginError').textContent = data.error;
-        }
-    } catch (err) {
+    if (username === 'admin' && password === 'admin123') {
+        sessionStorage.setItem('isAdmin', 'true');
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadEvents();
+    } else {
         document.getElementById('loginError').style.display = 'block';
-        document.getElementById('loginError').textContent = 'Cannot connect to server.';
+        document.getElementById('loginError').textContent = 'Invalid credentials.';
     }
 }
 
 async function loadEvents() {
     try {
-        const res = await fetch(`${API}/api/auth/admin/events`, { credentials: 'include' });
+        const res = await fetch(`${API}/api/events`);
         const events = await res.json();
         const tbody = document.getElementById('eventsBody');
 
@@ -189,30 +178,31 @@ async function loadEvents() {
 
         tbody.innerHTML = events.map(e => `
             <tr>
-                <td style="color:#888">#${e.event_id}</td>
-                <td style="font-weight:600">${e.event_title}</td>
+                <td style="color:#888">#${e.id}</td>
+                <td style="font-weight:600">${e.title}</td>
                 <td>${e.sport}</td>
                 <td>${e.venue}</td>
                 <td>${new Date(e.event_date).toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'})}</td>
                 <td style="color:#e63946;font-weight:600">$${parseFloat(e.price).toFixed(2)}</td>
-                <td>${e.available_seats} / ${e.total_seats}</td>
+                <td>${e.available_seats}</td>
                 <td><span class="badge ${e.status === 'Available' ? 'badge-green' : 'badge-red'}">${e.status}</span></td>
                 <td>
-                    <button class="btn-delete" onclick="deleteEvent(${e.event_id}, '${e.event_title}')">🗑️ Delete</button>
+                    <button class="btn-delete" onclick="deleteEvent(${e.id}, '${e.title}')">🗑️ Delete</button>
                 </td>
             </tr>
         `).join('');
     } catch (err) {
-        document.getElementById('eventsBody').innerHTML = '<tr><td colspan="9" style="color:red">Could not load events.</td></tr>';
+        document.getElementById('eventsBody').innerHTML = '<tr><td colspan="9" style="color:red">Could not load events. Backend may be sleeping — wait 30 seconds and refresh.</td></tr>';
     }
 }
 
 async function deleteEvent(id, title) {
-    if (!confirm(`Are you sure you want to delete "${title}"? This will also delete all bookings for this event.`)) return;
+    if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
 
     try {
         const res = await fetch(`${API}/api/auth/admin/events/${id}`, {
             method: 'DELETE',
+            headers: { 'admin-token': ADMIN_TOKEN },
             credentials: 'include'
         });
         const data = await res.json();
@@ -244,7 +234,10 @@ async function addEvent() {
     try {
         const res = await fetch(`${API}/api/auth/admin/events`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'admin-token': ADMIN_TOKEN
+            },
             credentials: 'include',
             body: JSON.stringify({ event_title, category_id, venue_id, event_date, event_time, price, total_seats })
         });
@@ -252,7 +245,6 @@ async function addEvent() {
         if (res.ok) {
             document.getElementById('addMsg').style.display = 'inline';
             setTimeout(() => document.getElementById('addMsg').style.display = 'none', 3000);
-            // Clear form
             document.getElementById('newTitle').value = '';
             document.getElementById('newDate').value = '';
             document.getElementById('newTime').value = '';
@@ -268,9 +260,20 @@ async function addEvent() {
 }
 
 function adminLogout() {
+    sessionStorage.removeItem('isAdmin');
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
 }
+
+// Check if already logged in
+window.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('isAdmin') === 'true') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadEvents();
+    }
+});
 </script>
+
 </body>
 </html>
